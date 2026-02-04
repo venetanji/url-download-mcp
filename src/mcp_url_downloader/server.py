@@ -536,9 +536,21 @@ Examples:
     
     # Update ALLOWED_BASE_DIRS if custom directories are provided
     if args.allowed_dirs:
-        ALLOWED_BASE_DIRS = [Path(d).resolve() for d in args.allowed_dirs]
-        # Print to stderr so it doesn't interfere with MCP stdio communication
-        print(f"Using allowed directories: {[str(d) for d in ALLOWED_BASE_DIRS]}", file=sys.stderr)
+        # Validate that directories exist
+        validated_dirs = []
+        for dir_path in args.allowed_dirs:
+            resolved_path = Path(dir_path).resolve()
+            if not resolved_path.exists():
+                print(f"Error: Directory does not exist: {dir_path}", file=sys.stderr)
+                sys.exit(1)
+            if not resolved_path.is_dir():
+                print(f"Error: Path is not a directory: {dir_path}", file=sys.stderr)
+                sys.exit(1)
+            validated_dirs.append(resolved_path)
+        
+        ALLOWED_BASE_DIRS = validated_dirs
+        # Only log count, not actual paths, for security
+        print(f"Using {len(ALLOWED_BASE_DIRS)} custom allowed director{'y' if len(ALLOWED_BASE_DIRS) == 1 else 'ies'}", file=sys.stderr)
     
     mcp.run(transport="stdio")
 

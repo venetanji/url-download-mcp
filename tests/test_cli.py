@@ -127,13 +127,52 @@ class TestCommandLineArguments:
             # Restore original
             server.ALLOWED_BASE_DIRS = original_dirs
 
+    def test_nonexistent_directory_exits(self, monkeypatch):
+        """Test that providing a non-existent directory exits with error."""
+        from mcp_url_downloader import server
+        original_dirs = server.ALLOWED_BASE_DIRS.copy()
+        
+        try:
+            # Use a directory that doesn't exist
+            monkeypatch.setattr(sys, "argv", ["mcp-url-downloader", "/nonexistent/path/that/does/not/exist"])
+            
+            with pytest.raises(SystemExit) as exc_info:
+                server.main()
+            
+            # Should exit with error code 1
+            assert exc_info.value.code == 1
+        finally:
+            # Restore original
+            server.ALLOWED_BASE_DIRS = original_dirs
+
+    def test_file_instead_of_directory_exits(self, monkeypatch, tmp_path):
+        """Test that providing a file instead of directory exits with error."""
+        from mcp_url_downloader import server
+        original_dirs = server.ALLOWED_BASE_DIRS.copy()
+        
+        try:
+            # Create a file instead of a directory
+            test_file = tmp_path / "test_file.txt"
+            test_file.write_text("test")
+            
+            monkeypatch.setattr(sys, "argv", ["mcp-url-downloader", str(test_file)])
+            
+            with pytest.raises(SystemExit) as exc_info:
+                server.main()
+            
+            # Should exit with error code 1
+            assert exc_info.value.code == 1
+        finally:
+            # Restore original
+            server.ALLOWED_BASE_DIRS = original_dirs
+
 
 class TestValidateOutputDirWithCustomDirs:
     """Tests for _validate_output_dir with custom allowed directories."""
 
     def test_custom_dir_is_allowed(self, tmp_path, monkeypatch):
         """Test that a custom allowed directory is accepted."""
-        from mcp_url_downloader.server import ALLOWED_BASE_DIRS, _validate_output_dir
+        from mcp_url_downloader.server import _validate_output_dir
         from mcp_url_downloader import server
         
         original_dirs = server.ALLOWED_BASE_DIRS.copy()
