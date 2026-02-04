@@ -12,7 +12,12 @@ A Model Context Protocol (MCP) server that enables AI assistants to download fil
 - Download single or multiple files from URLs with concurrent support
 - File size validation (configurable, default 500MB)
 - Unique filename generation to prevent overwrites
-- Security
+- **Configurable allowed directories** - specify exactly where files can be saved
+- Security features:
+  - SSRF protection (blocks private IPs and localhost)
+  - Path traversal protection
+  - MIME type validation
+  - File size limits
 
 ## Installation
 
@@ -35,6 +40,7 @@ uv sync
 
 To integrate server with Claude, add the following to your `claude_desktop_config.json` file:
 
+**Default configuration (uses ~/Downloads, ~/Documents, ~/Desktop, and /tmp):**
 ```json
 {
   "mcpServers": {
@@ -45,6 +51,24 @@ To integrate server with Claude, add the following to your `claude_desktop_confi
   }
 }
 ```
+
+**With custom allowed directories:**
+```json
+{
+  "mcpServers": {
+    "url-downloader": {
+      "command": "uvx",
+      "args": [
+        "mcp-url-downloader",
+        "D:\\ComfyUI\\output",
+        "D:\\MyDownloads"
+      ]
+    }
+  }
+}
+```
+
+**Note:** When you specify custom directories, only those directories (and their subdirectories) will be allowed for downloads. The default directories will not be used.
 ## Tools
 
 ### `download_single_file`

@@ -1,7 +1,9 @@
+import argparse
 import asyncio
 import ipaddress
 import re
 import socket
+import sys
 import urllib.parse
 import uuid
 from pathlib import Path
@@ -22,7 +24,7 @@ MAX_CONCURRENT_DOWNLOADS = 10
 MAX_URLS_PER_REQUEST = 100
 MAX_URL_LENGTH = 2048
 
-# Security: Allowed base directories for downloads
+# Security: Allowed base directories for downloads (can be overridden via command-line arguments)
 ALLOWED_BASE_DIRS = [
     Path.home() / "Downloads",
     Path.home() / "Documents",
@@ -506,6 +508,38 @@ async def download_single_file(
 
 def main():
     """Main entry point for the MCP URL Downloader server."""
+    global ALLOWED_BASE_DIRS
+    
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(
+        description="MCP URL Downloader Server - Download files from URLs to local filesystem",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Use default allowed directories
+  mcp-url-downloader
+
+  # Specify custom allowed directories
+  mcp-url-downloader /path/to/dir1 /path/to/dir2
+
+  # Windows example
+  mcp-url-downloader "D:\\ComfyUI\\output" "C:\\Users\\YourName\\Downloads"
+        """
+    )
+    parser.add_argument(
+        "allowed_dirs",
+        nargs="*",
+        help="Allowed base directories for downloads. If not specified, defaults to ~/Downloads, ~/Documents, ~/Desktop, and /tmp"
+    )
+    
+    args = parser.parse_args()
+    
+    # Update ALLOWED_BASE_DIRS if custom directories are provided
+    if args.allowed_dirs:
+        ALLOWED_BASE_DIRS = [Path(d).resolve() for d in args.allowed_dirs]
+        # Print to stderr so it doesn't interfere with MCP stdio communication
+        print(f"Using allowed directories: {[str(d) for d in ALLOWED_BASE_DIRS]}", file=sys.stderr)
+    
     mcp.run(transport="stdio")
 
 
