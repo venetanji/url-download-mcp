@@ -6,6 +6,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from mcp_url_downloader import server
+from mcp_url_downloader.server import _validate_output_dir
+
 
 class TestCommandLineArguments:
     """Tests for command-line argument parsing."""
@@ -13,7 +16,6 @@ class TestCommandLineArguments:
     def test_no_arguments_uses_default_dirs(self, monkeypatch):
         """Test that no arguments uses default allowed directories."""
         # Save original ALLOWED_BASE_DIRS
-        from mcp_url_downloader import server
         original_dirs = server.ALLOWED_BASE_DIRS.copy()
         
         try:
@@ -46,7 +48,6 @@ class TestCommandLineArguments:
 
     def test_custom_directories_override_defaults(self, monkeypatch, tmp_path):
         """Test that custom directories override default allowed directories."""
-        from mcp_url_downloader import server
         original_dirs = server.ALLOWED_BASE_DIRS.copy()
         
         try:
@@ -79,7 +80,6 @@ class TestCommandLineArguments:
 
     def test_single_custom_directory(self, monkeypatch, tmp_path):
         """Test with a single custom directory."""
-        from mcp_url_downloader import server
         original_dirs = server.ALLOWED_BASE_DIRS.copy()
         
         try:
@@ -106,7 +106,6 @@ class TestCommandLineArguments:
 
     def test_relative_paths_resolved_to_absolute(self, monkeypatch, tmp_path):
         """Test that relative paths are resolved to absolute paths."""
-        from mcp_url_downloader import server
         original_dirs = server.ALLOWED_BASE_DIRS.copy()
         
         try:
@@ -129,7 +128,6 @@ class TestCommandLineArguments:
 
     def test_nonexistent_directory_exits(self, monkeypatch):
         """Test that providing a non-existent directory exits with error."""
-        from mcp_url_downloader import server
         original_dirs = server.ALLOWED_BASE_DIRS.copy()
         
         try:
@@ -147,7 +145,6 @@ class TestCommandLineArguments:
 
     def test_file_instead_of_directory_exits(self, monkeypatch, tmp_path):
         """Test that providing a file instead of directory exits with error."""
-        from mcp_url_downloader import server
         original_dirs = server.ALLOWED_BASE_DIRS.copy()
         
         try:
@@ -172,9 +169,6 @@ class TestValidateOutputDirWithCustomDirs:
 
     def test_custom_dir_is_allowed(self, tmp_path, monkeypatch):
         """Test that a custom allowed directory is accepted."""
-        from mcp_url_downloader.server import _validate_output_dir
-        from mcp_url_downloader import server
-        
         original_dirs = server.ALLOWED_BASE_DIRS.copy()
         
         try:
@@ -195,9 +189,6 @@ class TestValidateOutputDirWithCustomDirs:
 
     def test_directory_outside_custom_dirs_blocked(self, tmp_path, monkeypatch):
         """Test that directories outside custom allowed dirs are blocked."""
-        from mcp_url_downloader.server import _validate_output_dir
-        from mcp_url_downloader import server
-        
         original_dirs = server.ALLOWED_BASE_DIRS.copy()
         
         try:

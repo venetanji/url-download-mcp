@@ -550,7 +550,7 @@ Examples:
         
         ALLOWED_BASE_DIRS = validated_dirs
         # Only log count, not actual paths, for security
-        print(f"Using {len(ALLOWED_BASE_DIRS)} custom allowed director{'y' if len(ALLOWED_BASE_DIRS) == 1 else 'ies'}", file=sys.stderr)
+        print(f"Using {len(ALLOWED_BASE_DIRS)} custom allowed directory(ies)", file=sys.stderr)
     
     mcp.run(transport="stdio")
 
